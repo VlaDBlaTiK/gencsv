@@ -1,0 +1,133 @@
+#include <iostream>
+#include <string> 
+#include <fstream> 
+#include <windows.h> 
+#include <vector>
+#include <sstream>
+
+using namespace std;;
+
+const vector<string> head = { "ФИО", "Дата_рождения", "Кол-во_проектов", "Рейтинг", "Комментарий" };
+const vector<string> type = { "String", "Date", "Integer", "Float", "String"};
+vector<string> tempmas = { "", "", "", "", "" };
+
+class person
+{
+public:
+	string FIO;
+	string date;
+	int proj;
+	float rate;
+	string comm;
+};
+
+int main(int argc, char* argv[])
+{
+	setlocale(LC_ALL, "");
+
+	cout << "Началось выполнение программы." << endl;
+
+	string infile_name;
+	string outfile_name;
+	string column_name;
+	string exp;
+
+	for (int i = 1; i < argc; i = i + 2)
+	{
+		if (strcmp(argv[i], "-in") == 0)
+		{
+			infile_name = argv[i + 1];
+		}
+		else if (strcmp(argv[i], "-out") == 0)
+		{
+			outfile_name = argv[i + 1];
+		}
+		else if (strcmp(argv[i], "-enc") == 0)
+		{
+			if (strcmp(argv[i + 1], "UTF-8") == 0) SetConsoleOutputCP(CP_UTF8);
+		}
+		else if (strcmp(argv[i], "-col") == 0)
+		{
+			column_name = argv[i + 1];
+		}
+		else if (strcmp(argv[i], "-exp") == 0)
+		{
+			exp = argv[i + 1];
+		}
+		else cout << "Параметры введены не корректно." << endl;
+	}
+
+	string temp;
+
+	ofstream out;
+	out.open(outfile_name);
+	if (out.is_open())
+	{
+		for (int i = 0; i < 5; i++)
+			out << head[i] << " " << type[i] << ";";
+		out << endl;
+	}
+
+	ifstream in;
+	in.open(infile_name);
+	if (!in.is_open()) cout << "Файл не открыт!";
+	else
+	{
+		person person;
+		string line;
+
+		getline(in, line);
+
+		while (getline(in, line))
+		{
+			stringstream ss(line);
+			string tempFIO, tempDate, tempProj, tempRate, tempComm, data;
+
+			if (getline(ss, tempFIO, ';') &&
+				getline(ss, tempDate, ';') &&
+				getline(ss, tempProj, ';') &&
+				getline(ss, tempRate, ';') &&
+				getline(ss, tempComm, ';'))
+			{
+				tempmas[0] = tempFIO;
+				tempmas[1] = tempDate;
+				tempmas[2] = tempProj;
+				tempmas[3] = tempRate;
+				tempmas[4] = tempComm;
+
+				string str = "";
+				int k = -1;
+
+				for (int i = 0; i < 5; i++)
+				{
+					k++;
+					if (column_name == head[i]) break;
+				}
+
+				if (k == -1)
+				{
+					cout << "Название колонки введено неверно";
+				}
+				else
+				{
+					if (tempmas[k] == exp)
+					{
+						for (int i = 0; i < 5; i++)
+						{
+							str += tempmas[i];
+							str += ";";
+						}
+						data = str + "\n";
+					}								
+						out << data << endl;					
+					k = -1;
+				}
+			}
+		}
+		in.close();
+		out.close();
+		cout << "Программа завершила выполнение.";
+	}
+}
+
+
