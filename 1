@@ -1,0 +1,82 @@
+#include <iostream>
+#include <string> 
+#include <fstream> 
+#include <windows.h> 
+#include <random>
+
+using namespace std;
+
+const vector<string> type = { "INTEGER", "FLOAT", "DATE", "STRING" };
+const vector<string> head = { "ФИО", "РЕЙТИНГ", "Кол-во_проектов", "Комментарий", "Дата_рождения" };
+
+string randstr(int a) // Функция для генерации строк со случайными символами
+{
+    string symbols = "АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя1234567890."; // 76
+    string str = u8"";
+
+    int lenght = rand() % (a - 1);
+    str.resize(lenght);
+    
+    for (int i = 0; i < lenght; i++)
+    {
+        str[i] = symbols[rand() % (76 - 1)];
+    }
+
+    return str;
+}
+
+int main(int argc, char* argv[])
+{   
+    setlocale(LC_ALL, "");
+
+    int column_count = 0;
+    int row_count = 0;
+    int length = 0;
+    string file_name;
+
+    for (int i = 1; i < argc; i++) // Чтение и запись аргументов из консоли
+    {
+        if (strcmp(argv[i], "-col") == 0)
+        {
+            column_count = stoi(argv[i + 1]);
+        }
+        if (strcmp(argv[i], "-row") == 0)
+        {
+            row_count = stoi(argv[i + 1]);
+        }
+        if (strcmp(argv[i], "-len") == 0)
+        {
+            length = stoi(argv[i + 1]);
+        }
+        if (strcmp(argv[i], "-out") == 0)
+        {
+            file_name = argv[i + 1];
+        }  
+        if (strcmp(argv[i], "-enc") == 0)
+        {
+            if (strcmp(argv[i+1], "UTF-8") == 0) SetConsoleOutputCP(CP_UTF8);
+        }
+    }
+
+    ofstream out; // Запись символов в файл
+    out.open(file_name);
+    if (out.is_open())
+    {           
+        for (int i = 0; i < column_count; i++)
+        {
+            out << head[rand() % 5] + " " + type[rand() % 4] + ";";
+        }
+        out << endl;
+        
+        for (int i = 0; i < row_count; i++)
+        {
+            for (int j = 0; j < column_count; j++)
+            {
+                out << randstr(length) + ";";                
+            }
+            out << endl;
+        }        
+    }
+    out.close();
+    cout << "Генерация данных законченна.";
+}
